@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>React Mastery Guide</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f8f8f6;
+    --surface: #ffffff;
+    --surface-2: #f2f2ef;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c58;
+    --text-muted: #999994;
+    --border: #e0e0da;
+    --border-strong: #c8c8c2;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --accent-text: #1d4ed8;
+    --purple-bg: #f5f3ff;
+    --purple-text: #5b21b6;
+    --green-bg: #f0fdf4;
+    --green-text: #166534;
+    --amber-bg: #fffbeb;
+    --amber-text: #92400e;
+    --red-bg: #fef2f2;
+    --red-text: #991b1b;
+    --radius: 8px;
+    --font: system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, 'Cascadia Code', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413;
+      --surface: #1e1e1c;
+      --surface-2: #252523;
+      --text-primary: #f0f0ec;
+      --text-secondary: #9e9e98;
+      --text-muted: #666662;
+      --border: #2c2c2a;
+      --border-strong: #3a3a38;
+      --accent-bg: #1e2d4a;
+      --accent-text: #93bbfc;
+      --purple-bg: #2e1f47;
+      --purple-text: #c4b5fd;
+      --green-bg: #14291c;
+      --green-text: #86efac;
+      --amber-bg: #292110;
+      --amber-text: #fcd34d;
+      --red-bg: #291414;
+      --red-text: #fca5a5;
+    }
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    padding: 2rem 1.5rem 4rem;
+    max-width: 780px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .hero { margin-bottom: 2rem; }
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: .4rem;
+  }
+  h1 { font-size: 2rem; font-weight: 600; margin-bottom: .35rem; }
+  h1 span { color: var(--accent); }
+  .hero-sub { font-size: 15px; color: var(--text-secondary); }
+
+  .progress-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: .75rem 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-icon { font-size: 18px; }
+  .bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width .4s ease;
+  }
+  .bar-label { font-size: 13px; color: var(--text-secondary); white-space: nowrap; min-width: 56px; text-align: right; }
+
+  .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.75rem; }
+  .pill {
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    font-size: 13px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all .15s;
+    font-family: var(--font);
+  }
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+  .pill.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); font-weight: 500; }
+
+  .phase { margin-bottom: 2rem; }
+  .phase-header { display: flex; align-items: center; gap: 10px; margin-bottom: .85rem; }
+  .phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .phase-title { font-size: 13px; font-weight: 600; letter-spacing: .04em; color: var(--text-secondary); text-transform: uppercase; }
+  .phase-count { font-size: 12px; color: var(--text-muted); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 10px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: .9rem;
+    cursor: pointer;
+    transition: border-color .15s, transform .1s, box-shadow .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+  .card.done { opacity: .55; }
+  .card.done .card-title { text-decoration: line-through; text-decoration-color: var(--text-muted); }
+
+  .card-check {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: all .15s;
+    z-index: 2;
+  }
+  .card-check:hover { border-color: var(--accent); color: var(--accent); }
+  .card-check.checked { background: var(--green-bg); border-color: var(--green-text); color: var(--green-text); }
+
+  .card-icon { font-size: 22px; display: block; margin-bottom: .4rem; }
+  .card-title { font-size: 14px; font-weight: 600; margin-bottom: .2rem; padding-right: 24px; }
+  .card-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: .5rem; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .tag-core    { background: var(--accent-bg); color: var(--accent-text); }
+  .tag-hooks   { background: var(--purple-bg); color: var(--purple-text); }
+  .tag-pattern { background: var(--green-bg); color: var(--green-text); }
+  .tag-perf    { background: var(--amber-bg); color: var(--amber-text); }
+  .tag-test    { background: var(--red-bg); color: var(--red-text); }
+
+  /* Detail panel */
+  .detail-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: .9rem;
+    z-index: 5;
+    flex-direction: column;
+    gap: .4rem;
+  }
+  .detail-overlay.open { display: flex; }
+  .detail-close {
+    position: absolute; top: 8px; right: 8px;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 16px; padding: 2px 6px;
+    line-height: 1;
+    font-family: var(--font);
+  }
+  .detail-close:hover { color: var(--text-primary); }
+  .detail-title { font-size: 13px; font-weight: 600; padding-right: 24px; }
+  .detail-list { list-style: none; margin-top: .25rem; }
+  .detail-list li {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 6px;
+  }
+  .detail-list li:last-child { border: none; }
+  .detail-list li::before { content: "›"; color: var(--text-muted); flex-shrink: 0; }
+
+  .empty { color: var(--text-muted); font-size: 14px; padding: .5rem 0; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">Learning Roadmap</div>
+  <h1>React <span>Mastery</span> Guide</h1>
+  <div class="hero-sub">From fundamentals to production-grade patterns · Click any card to see subtopics · Check off what you know</div>
+</div>
+
+<div class="progress-wrap">
+  <span class="progress-icon">⚡</span>
+  <div class="bar-bg"><div class="bar-fill" id="bar" style="width:0%"></div></div>
+  <span class="bar-label" id="bar-label">0 / 24</span>
+</div>
+
+<div class="filter-bar">
+  <button class="pill active" data-f="all">All topics</button>
+  <button class="pill" data-f="core">Core</button>
+  <button class="pill" data-f="hooks">Hooks</button>
+  <button class="pill" data-f="pattern">Patterns</button>
+  <button class="pill" data-f="perf">Performance</button>
+  <button class="pill" data-f="test">Testing</button>
+</div>
+
+<div id="phases"></div>
+
+<script>
+const DATA = [
+  {
+    phase:"Foundations", dot:"#2563eb",
+    topics:[
+      {icon:"⚛️",title:"JSX & Components",tag:"core",desc:"Compose UIs from reusable pieces",subs:["JSX syntax & expressions","Function vs class components","Props and prop types","Component composition","Fragments and portals"]},
+      {icon:"🎯",title:"State & Events",tag:"core",desc:"React to user interactions",subs:["useState hook","Event handlers","Synthetic events","Controlled vs uncontrolled","State batching in React 18"]},
+      {icon:"🌊",title:"Rendering & Lifecycle",tag:"core",desc:"How React updates the DOM",subs:["Virtual DOM reconciliation","Commit vs render phase","StrictMode double-invoke","useEffect cleanup","Dependency arrays"]},
+      {icon:"📦",title:"Props & Children",tag:"core",desc:"Data flow and composition",subs:["Props drilling basics","children prop","Render props pattern","Prop spreading","Default props"]},
+    ]
+  },
+  {
+    phase:"Hooks Deep Dive", dot:"#7c3aed",
+    topics:[
+      {icon:"🪝",title:"useEffect",tag:"hooks",desc:"Side effects and data fetching",subs:["Effect scheduling","Cleanup functions","Avoiding infinite loops","Fetching data safely","AbortController pattern"]},
+      {icon:"🔄",title:"useCallback & useMemo",tag:"hooks",desc:"Memoize functions and values",subs:["Referential equality","When not to memoize","Dependency arrays","useMemo for expensive math","useCallback with children"]},
+      {icon:"📐",title:"useRef & forwardRef",tag:"hooks",desc:"DOM access and escape hatches",subs:["DOM node access","Storing mutable values","forwardRef pattern","useImperativeHandle","Focus management"]},
+      {icon:"🧩",title:"useReducer & useContext",tag:"hooks",desc:"Complex state and shared data",subs:["Reducer pattern","Action creators","Context API","Avoiding re-renders","Combining context + reducer"]},
+      {icon:"🪄",title:"Custom Hooks",tag:"hooks",desc:"Extract and reuse stateful logic",subs:["Hook naming rules","useFetch pattern","useLocalStorage","useDebounce","Composing hooks together"]},
+    ]
+  },
+  {
+    phase:"Architecture & Patterns", dot:"#059669",
+    topics:[
+      {icon:"🗂️",title:"State Management",tag:"pattern",desc:"Scale your app state",subs:["Local vs global state","Zustand basics","Redux Toolkit","Jotai / atoms","Server vs client state"]},
+      {icon:"📡",title:"Data Fetching",tag:"pattern",desc:"Async patterns that scale",subs:["React Query basics","SWR vs React Query","Suspense for data","Optimistic updates","Mutation and invalidation"]},
+      {icon:"🧱",title:"Compound Components",tag:"pattern",desc:"Flexible, composable APIs",subs:["Implicit state sharing","Context in components","Flexible slot pattern","Controlled compound","Real-world: Select, Tabs"]},
+      {icon:"🎛️",title:"Form Management",tag:"pattern",desc:"Inputs, validation, submission",subs:["React Hook Form","Zod schemas","Field arrays","Watch and reset","Error messages"]},
+      {icon:"🌐",title:"Routing",tag:"pattern",desc:"Navigation in React apps",subs:["React Router v6","File-based routing (Next.js)","Nested routes","Protected routes","Search params"]},
+    ]
+  },
+  {
+    phase:"Performance", dot:"#d97706",
+    topics:[
+      {icon:"⚡",title:"Re-render Optimization",tag:"perf",desc:"Prevent unnecessary work",subs:["React.memo","Why components re-render","Profiler DevTools","Context pitfalls","State colocation"]},
+      {icon:"🦥",title:"Code Splitting",tag:"perf",desc:"Load only what's needed",subs:["React.lazy","Suspense boundaries","Route-level splitting","Prefetching chunks","Bundle analysis"]},
+      {icon:"🖼️",title:"Virtualization",tag:"perf",desc:"Handle long lists efficiently",subs:["react-window basics","Dynamic row heights","Infinite scroll","TanStack Virtual","When to virtualize"]},
+      {icon:"🔁",title:"Concurrent Features",tag:"perf",desc:"React 18's new primitives",subs:["useTransition","useDeferredValue","Concurrent mode gotchas","Suspense coordination","startTransition"]},
+    ]
+  },
+  {
+    phase:"Testing & Quality", dot:"#dc2626",
+    topics:[
+      {icon:"🧪",title:"React Testing Library",tag:"test",desc:"Test behavior, not implementation",subs:["render and queries","user-event v14","Async utilities","Custom renders","Testing hooks"]},
+      {icon:"🎭",title:"Mocking & Integration",tag:"test",desc:"Isolate and control dependencies",subs:["vi.mock / jest.mock","MSW for API mocking","Context in tests","Testing forms","Snapshot testing"]},
+      {icon:"🚀",title:"E2E with Playwright",tag:"test",desc:"Full browser automation",subs:["Locator strategies","Page Object Model","Visual regression","Network intercepts","CI integration"]},
+      {icon:"🔍",title:"TypeScript + React",tag:"test",desc:"Type-safe components",subs:["FC and ReactNode","Event types","Generic components","Discriminated unions","Typing hooks"]},
+    ]
+  }
+];
+
+const TOTAL = DATA.flatMap(p=>p.topics).length;
+let done = new Set(JSON.parse(localStorage.getItem('rm2-done')||'[]'));
+let activeFilter = 'all';
+
+function save(){ try{ localStorage.setItem('rm2-done', JSON.stringify([...done])); }catch(e){} }
+
+function updateProgress(){
+  const pct = Math.round((done.size / TOTAL) * 100);
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('bar-label').textContent = done.size + ' / ' + TOTAL;
+}
+
+function toggleDone(id, e){
+  e.stopPropagation();
+  if(done.has(id)) done.delete(id); else done.add(id);
+  save();
+  const card = document.querySelector('[data-id="'+id+'"]');
+  if(!card) return;
+  const chk = card.querySelector('.card-check');
+  card.classList.toggle('done', done.has(id));
+  chk.classList.toggle('checked', done.has(id));
+  chk.textContent = done.has(id) ? '✓' : '';
+  updateProgress();
+}
+
+function openDetail(id, e){
+  if(e.target.closest('.card-check')) return;
+  const card = document.querySelector('[data-id="'+id+'"]');
+  if(!card) return;
+  card.querySelector('.detail-overlay').classList.add('open');
+}
+function closeDetail(id, e){
+  e.stopPropagation();
+  const card = document.querySelector('[data-id="'+id+'"]');
+  if(!card) return;
+  card.querySelector('.detail-overlay').classList.remove('open');
+}
+
+function render(){
+  const container = document.getElementById('phases');
+  container.innerHTML = '';
+  DATA.forEach(phase => {
+    const filtered = activeFilter === 'all' ? phase.topics : phase.topics.filter(t => t.tag === activeFilter);
+    if(!filtered.length) return;
+
+    const sec = document.createElement('div');
+    sec.className = 'phase';
+
+    const header = document.createElement('div');
+    header.className = 'phase-header';
+    header.innerHTML = `<div class="phase-dot" style="background:${phase.dot}"></div>
+      <span class="phase-title">${phase.phase}</span>
+      <span class="phase-count">${filtered.length} topic${filtered.length!==1?'s':''}</span>`;
+    sec.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    filtered.forEach(t => {
+      const id = t.title.replace(/[^a-z0-9]/gi, '-');
+      const isDone = done.has(id);
+      const tagClass = {core:'tag-core',hooks:'tag-hooks',pattern:'tag-pattern',perf:'tag-perf',test:'tag-test'}[t.tag] || 'tag-core';
+
+      const card = document.createElement('div');
+      card.className = 'card' + (isDone ? ' done' : '');
+      card.setAttribute('data-id', id);
+      card.onclick = (e) => openDetail(id, e);
+
+      card.innerHTML = `
+        <button class="card-check${isDone?' checked':''}" onclick="toggleDone('${id}',event)">${isDone?'✓':''}</button>
+        <span class="card-icon">${t.icon}</span>
+        <div class="card-title">${t.title}</div>
+        <div class="card-desc">${t.desc}</div>
+        <span class="tag ${tagClass}">${t.tag}</span>
+        <div class="detail-overlay">
+          <button class="detail-close" onclick="closeDetail('${id}',event)">✕</button>
+          <div class="detail-title">${t.icon} ${t.title}</div>
+          <ul class="detail-list">${t.subs.map(s=>`<li>${s}</li>`).join('')}</ul>
+        </div>`;
+
+      grid.appendChild(card);
+    });
+
+    sec.appendChild(grid);
+    container.appendChild(sec);
+  });
+  updateProgress();
+}
+
+// Filter pills
+document.querySelectorAll('.pill').forEach(btn => {
+  btn.onclick = () => {
+    activeFilter = btn.dataset.f;
+    document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p === btn));
+    render();
+  };
+});
+
+render();
+</script>
+</body>
+</html>
